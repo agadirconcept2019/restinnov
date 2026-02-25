@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Database\Seeders\Blog\BlogSeeder;
 use Database\Seeders\CmsPages\CmsPagesSeeder;
 use Database\Seeders\Core\CoreSeeder;
 use Database\Seeders\Forms\FormsDemoSeeder;
@@ -16,5 +17,6 @@ class DatabaseSeeder extends Seeder
         $this->call(RealEstateSeeder::class);
         $this->call(CmsPagesSeeder::class);
         $this->call(FormsDemoSeeder::class);
+        $this->call(BlogSeeder::class);
     }
 }

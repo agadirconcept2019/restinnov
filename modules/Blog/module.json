@@ -2,5 +2,7 @@
   "name": "Blog",
   "slug": "blog",
   "version": "1.0.0",
-  "providers": []
+  "providers": [
+    "App\\Modules\\Blog\\BlogServiceProvider"
+  ]
 }
