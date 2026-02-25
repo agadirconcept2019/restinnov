@@ -1,0 +1,10 @@
+{
+  "name": "Forms",
+  "slug": "forms",
+  "version": "1.0.0",
+  "description": "Contact and quote forms module",
+  "providers": [],
+  "requires": "^1.0",
+  "routes": {"web": true, "admin": true, "api": false},
+  "permissions": ["forms.manage"]
+}

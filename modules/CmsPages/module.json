@@ -1,0 +1,10 @@
+{
+  "name": "CMS Pages",
+  "slug": "cms-pages",
+  "version": "1.0.0",
+  "description": "Structured static pages module",
+  "providers": [],
+  "requires": "^1.0",
+  "routes": {"web": true, "admin": true, "api": false},
+  "permissions": ["pages.manage"]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "Blog",
+  "slug": "blog",
+  "version": "1.0.0",
+  "description": "Editorial blog module",
+  "providers": [],
+  "requires": "^1.0",
+  "routes": {"web": true, "admin": true, "api": false},
+  "permissions": ["posts.manage"]
+}
