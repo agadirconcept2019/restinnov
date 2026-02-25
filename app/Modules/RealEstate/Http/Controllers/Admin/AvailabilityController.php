@@ -29,12 +29,16 @@ class AvailabilityController extends Controller
 
     public function bulkUpdate(BulkAvailabilityRequest $request, AvailabilityServiceV2 $service, AuditLogger $auditLogger)
     {
-        $updated = $service->bulkUpdate(
-            (int) $request->integer('property_id'),
-            $request->string('from_date'),
-            $request->string('to_date'),
-            $request->validated(),
-        );
+        try {
+            $updated = $service->bulkUpdate(
+                (int) $request->integer('property_id'),
+                $request->string('from_date'),
+                $request->string('to_date'),
+                $request->validated(),
+            );
+        } catch (\InvalidArgumentException|\RuntimeException $exception) {
+            return back()->withErrors(['from_date' => $exception->getMessage()])->withInput();
+        }
 
         $auditLogger->log('realestate.availability.bulk_update', null, ['property_id' => $request->integer('property_id'), 'updated_days' => $updated]);
 
