@@ -4,6 +4,7 @@ namespace App\Modules\RealEstate\Sitemap;
 
 use App\Core\Sitemap\SitemapProviderInterface;
 use App\Models\RealEstate\Property;
+use Illuminate\Support\Facades\Storage;
 
 class RealEstateSitemapProvider implements SitemapProviderInterface
 {
@@ -15,12 +16,23 @@ class RealEstateSitemapProvider implements SitemapProviderInterface
             'alternates' => $this->alternates('/our-properties'),
         ]];
 
-        foreach (Property::query()->published()->get() as $property) {
+        foreach (Property::query()->with('images.media')->published()->get() as $property) {
             $path = '/properties/'.$property->slug;
             $items[] = [
                 'loc' => url($path),
                 'lastmod' => optional($property->updated_at)->toAtomString(),
                 'alternates' => $this->alternates($path),
+                'images' => $property->images->map(function ($image) {
+                    if (! $image->media) {
+                        return null;
+                    }
+
+                    $relative = Storage::disk($image->media->disk)->url($image->media->path);
+
+                    return str_starts_with($relative, 'http://') || str_starts_with($relative, 'https://')
+                        ? $relative
+                        : url($relative);
+                })->filter()->values()->all(),
             ];
         }
 

@@ -12,6 +12,7 @@
     <meta property="og:url" content="{{ $seo['canonical_url'] ?? url()->current() }}">
     @if(!empty($seo['og_image']))
         <meta property="og:image" content="{{ $seo['og_image'] }}">
+        <meta name="twitter:image" content="{{ $seo['og_image'] }}">
     @endif
     <meta name="twitter:card" content="{{ $seo['twitter_card'] ?? 'summary_large_image' }}">
     <meta name="twitter:title" content="{{ $seo['og_title'] ?? ($seo['meta_title'] ?? config('app.name')) }}">
@@ -20,6 +21,12 @@
     @foreach(($seo['hreflang'] ?? []) as $locale => $href)
         <link rel="alternate" hreflang="{{ $locale }}" href="{{ $href }}">
     @endforeach
+    @if(!empty($seo['prev_url']))
+        <link rel="prev" href="{{ $seo['prev_url'] }}">
+    @endif
+    @if(!empty($seo['next_url']))
+        <link rel="next" href="{{ $seo['next_url'] }}">
+    @endif
     <link rel="alternate" hreflang="x-default" href="{{ ($seo['hreflang'][config('locales.default','en')] ?? ($seo['canonical_url'] ?? url()->current())) }}">
     @if(!empty($seo['schema_json']))
         <script type="application/ld+json">{!! json_encode($seo['schema_json'], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}</script>
@@ -42,6 +49,21 @@
     </div>
 </header>
 <main class="mx-auto max-w-6xl p-6">
+    @if(!empty($seo['breadcrumbs']) && count($seo['breadcrumbs']) > 1)
+        <nav aria-label="Breadcrumb" class="mb-4 text-sm text-slate-500">
+            <ol class="flex flex-wrap gap-1">
+                @foreach($seo['breadcrumbs'] as $breadcrumb)
+                    <li>
+                        <a href="{{ $breadcrumb['url'] }}" class="hover:text-slate-800">{{ $breadcrumb['label'] }}</a>
+                        @if(!$loop->last)
+                            <span class="mx-1">/</span>
+                        @endif
+                    </li>
+                @endforeach
+            </ol>
+        </nav>
+    @endif
+
     @if($errors->any())
         <div class="mb-4 rounded bg-red-100 p-3 text-red-700">
             <ul class="list-disc pl-5">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>

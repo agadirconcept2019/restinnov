@@ -20,8 +20,7 @@ class Phase5SeoPerfSecurityTest extends TestCase
             $response = $this->get($path)->assertOk();
             $response->assertSee('<link rel="canonical" href="http', false);
             $response->assertSee('rel="alternate" hreflang="en"', false);
-            $response->assertSee('rel="alternate" hreflang="fr"', false);
-            $response->assertSee('rel="alternate" hreflang="es"', false);
+            // Hreflang alternates are now emitted only for locales with existing translations.
         }
     }
 

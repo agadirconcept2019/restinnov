@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\Core\MenuController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\OpsController;
 use App\Http\Controllers\Admin\RedirectController;
+use App\Http\Controllers\Admin\SeoDiagnosticsController;
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 
@@ -50,6 +51,7 @@ Route::middleware('web')->prefix('admin')->name('admin.')->group(function () {
         Route::post('/saved-views/{view}/apply', [AdminProductivityController::class, 'applyView'])->name('saved-views.apply');
         Route::delete('/saved-views/{view}', [AdminProductivityController::class, 'deleteView'])->name('saved-views.destroy');
 
+        Route::get('/seo/diagnostics', SeoDiagnosticsController::class)->middleware('permission:seo.manage')->name('seo.diagnostics');
         Route::post('/exports/queue', [AdminProductivityController::class, 'queueExport'])->middleware('permission:admin.exports.run')->name('exports.queue');
         Route::get('/exports', [AdminProductivityController::class, 'exports'])->middleware('permission:admin.exports.run')->name('exports.index');
         Route::get('/exports/{run}/download', [AdminProductivityController::class, 'downloadExport'])->middleware('permission:admin.exports.run')->name('exports.download');
