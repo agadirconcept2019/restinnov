@@ -2,6 +2,7 @@
 
 namespace App\Modules\Blog\Http\Controllers\Admin;
 
+use App\Core\Audit\AuditLogger;
 use App\Http\Controllers\Controller;
 use App\Modules\Blog\Http\Requests\Admin\StorePostRequest;
 use App\Modules\Blog\Models\Post;
@@ -29,7 +30,7 @@ class PostController extends Controller
         return view('blog::admin.posts.form', ['post' => new Post, 'categories' => PostCategory::with('translations')->get()]);
     }
 
-    public function store(StorePostRequest $request)
+    public function store(StorePostRequest $request, AuditLogger $auditLogger)
     {
         $post = Post::query()->create([
             'slug' => $request->input('slug'),
@@ -40,6 +41,7 @@ class PostController extends Controller
         ]);
 
         $this->syncPost($post, $request->validated());
+        $auditLogger->log($post->status === 'published' ? 'post.published' : 'post.created', $post, ['slug' => $post->slug]);
 
         return redirect()->route('admin.blog.posts.edit', $post)->with('status', 'Post created.');
     }
@@ -51,7 +53,7 @@ class PostController extends Controller
         return view('blog::admin.posts.form', ['post' => $post, 'categories' => PostCategory::with('translations')->get()]);
     }
 
-    public function update(StorePostRequest $request, Post $post)
+    public function update(StorePostRequest $request, Post $post, AuditLogger $auditLogger)
     {
         $post->update([
             'slug' => $request->input('slug'),
@@ -61,12 +63,14 @@ class PostController extends Controller
         ]);
 
         $this->syncPost($post, $request->validated());
+        $auditLogger->log($post->status === 'published' ? 'post.published' : 'post.updated', $post, ['slug' => $post->slug]);
 
         return back()->with('status', 'Post updated.');
     }
 
-    public function destroy(Post $post)
+    public function destroy(Post $post, AuditLogger $auditLogger)
     {
+        $auditLogger->log('post.deleted', $post, ['slug' => $post->slug]);
         $post->delete();
 
         return redirect()->route('admin.blog.posts.index')->with('status', 'Post deleted.');

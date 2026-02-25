@@ -53,6 +53,7 @@
                     <input name="website_url" class="w-full rounded border p-2" placeholder="Website URL">
                     <textarea name="message" class="w-full rounded border p-2" placeholder="Message" required></textarea>
                     <input name="company_name" class="hidden" autocomplete="off" tabindex="-1">
+                    <input type="hidden" name="submitted_at" value="{{ time() }}">
                     <button class="rounded bg-blue-600 px-4 py-2 text-white">Send</button>
                 </form>
 
@@ -66,6 +67,7 @@
                     <textarea name="message" class="w-full rounded border p-2" placeholder="Message" required></textarea>
                     <input name="preferred_contact_method" class="w-full rounded border p-2" placeholder="Preferred contact method">
                     <input name="company_name" class="hidden" autocomplete="off" tabindex="-1">
+                    <input type="hidden" name="submitted_at" value="{{ time() }}">
                     <button class="rounded bg-slate-900 px-4 py-2 text-white">Request quote</button>
                 </form>
             </div>

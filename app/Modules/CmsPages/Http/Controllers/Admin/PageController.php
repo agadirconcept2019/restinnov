@@ -2,6 +2,7 @@
 
 namespace App\Modules\CmsPages\Http\Controllers\Admin;
 
+use App\Core\Audit\AuditLogger;
 use App\Http\Controllers\Controller;
 use App\Models\CmsPages\Page;
 use App\Modules\CmsPages\Http\Requests\Admin\StorePageRequest;
@@ -20,7 +21,7 @@ class PageController extends Controller
         return view('cmspages::admin.pages.form', ['page' => new Page]);
     }
 
-    public function store(StorePageRequest $request)
+    public function store(StorePageRequest $request, AuditLogger $auditLogger)
     {
         $page = Page::query()->create([
             'slug' => $request->input('slug'),
@@ -33,6 +34,7 @@ class PageController extends Controller
         ]);
 
         $this->syncTranslations($page, $request->validated());
+        $auditLogger->log($page->status === 'published' ? 'page.published' : 'page.created', $page, ['slug' => $page->slug]);
 
         return redirect()->route('admin.cms-pages.pages.edit', $page)->with('status', 'Page created.');
     }
@@ -44,7 +46,7 @@ class PageController extends Controller
         return view('cmspages::admin.pages.form', compact('page'));
     }
 
-    public function update(StorePageRequest $request, Page $page)
+    public function update(StorePageRequest $request, Page $page, AuditLogger $auditLogger)
     {
         $page->update([
             'slug' => $request->input('slug'),
@@ -55,12 +57,14 @@ class PageController extends Controller
         ]);
 
         $this->syncTranslations($page, $request->validated());
+        $auditLogger->log($page->status === 'published' ? 'page.published' : 'page.updated', $page, ['slug' => $page->slug]);
 
         return back()->with('status', 'Page updated.');
     }
 
-    public function destroy(Page $page)
+    public function destroy(Page $page, AuditLogger $auditLogger)
     {
+        $auditLogger->log('page.deleted', $page, ['slug' => $page->slug]);
         $page->delete();
 
         return redirect()->route('admin.cms-pages.pages.index')->with('status', 'Page deleted.');

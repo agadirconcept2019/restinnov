@@ -7,10 +7,7 @@ use Illuminate\Validation\Rule;
 
 class ContactSubmissionRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
+    public function authorize(): bool { return true; }
 
     public function rules(): array
     {
@@ -18,12 +15,13 @@ class ContactSubmissionRequest extends FormRequest
             'first_name' => ['required', 'string', 'max:120'],
             'last_name' => ['required', 'string', 'max:120'],
             'phone' => ['nullable', 'string', 'max:50'],
-            'email' => ['required', 'email', 'max:255'],
+            'email' => ['required', 'email', 'max:180'],
             'subject_type' => ['required', Rule::in(['owner', 'traveler', 'other'])],
             'website_url' => ['nullable', 'url', 'max:255'],
-            'message' => ['required', 'string', 'max:3000'],
+            'message' => ['required', 'string', 'max:4000'],
             'company_name' => ['nullable', 'max:0'],
-            'captcha_token' => ['nullable', 'string'],
+            'submitted_at' => ['required', 'integer', 'max:'.(time() - 2)],
+            'captcha_token' => ['nullable', 'string', 'max:400'],
         ];
     }
 }

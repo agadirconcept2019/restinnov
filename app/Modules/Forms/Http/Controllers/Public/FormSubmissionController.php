@@ -2,12 +2,14 @@
 
 namespace App\Modules\Forms\Http\Controllers\Public;
 
+use App\Core\Settings\SettingsService;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendFormNotificationJob;
 use App\Models\Forms\FormSubmission;
 use App\Modules\Forms\Http\Requests\Public\ContactSubmissionRequest;
 use App\Modules\Forms\Http\Requests\Public\QuoteSubmissionRequest;
-use App\Core\Settings\SettingsService;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Log;
 
 class FormSubmissionController extends Controller
 {
@@ -21,16 +23,7 @@ class FormSubmissionController extends Controller
             return back()->withErrors(['captcha' => 'Captcha required.'])->withInput();
         }
 
-        $submission = FormSubmission::query()->create([
-            'form_type' => 'contact',
-            'locale' => app()->getLocale(),
-            'payload' => $request->validated(),
-            'status' => 'new',
-            'ip_hash' => hash('sha256', (string) $request->ip()),
-            'user_agent' => (string) $request->userAgent(),
-            'source_url' => (string) url()->previous(),
-        ]);
-
+        $submission = FormSubmission::query()->create($this->payload('contact', $request->validated(), $request));
         $this->notify($submission);
 
         return back()->with('status', 'Votre message a été envoyé.');
@@ -42,28 +35,37 @@ class FormSubmissionController extends Controller
             return back()->withErrors(['captcha' => 'Captcha required.'])->withInput();
         }
 
-        $submission = FormSubmission::query()->create([
-            'form_type' => 'quote',
-            'locale' => app()->getLocale(),
-            'payload' => $request->validated(),
-            'status' => 'new',
-            'ip_hash' => hash('sha256', (string) $request->ip()),
-            'user_agent' => (string) $request->userAgent(),
-            'source_url' => (string) url()->previous(),
-        ]);
-
+        $submission = FormSubmission::query()->create($this->payload('quote', $request->validated(), $request));
         $this->notify($submission);
 
         return back()->with('status', 'Votre demande de devis a été envoyée.');
     }
 
+    private function payload(string $formType, array $validated, $request): array
+    {
+        unset($validated['company_name'], $validated['submitted_at'], $validated['captcha_token']);
+
+        return [
+            'form_type' => $formType,
+            'locale' => app()->getLocale(),
+            'payload' => $validated,
+            'status' => 'new',
+            'ip_hash' => hash('sha256', (string) $request->ip()),
+            'user_agent' => (string) $request->userAgent(),
+            'source_url' => (string) url()->previous(),
+            'submitted_at' => (int) $request->input('submitted_at'),
+        ];
+    }
+
     private function notify(FormSubmission $submission): void
     {
-        $to = config('mail.from.address');
-        if (! $to) {
-            return;
+        try {
+            Bus::dispatch(new SendFormNotificationJob($submission->id));
+        } catch (\Throwable $e) {
+            Log::warning('forms.notification_dispatch_failed', [
+                'submission_id' => $submission->id,
+                'error' => $e->getMessage(),
+            ]);
         }
-
-        Mail::raw('New '.$submission->form_type.' submission #'.$submission->id, fn ($msg) => $msg->to($to)->subject('New '.$submission->form_type.' submission'));
     }
 }

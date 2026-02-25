@@ -5,6 +5,7 @@ namespace App\Modules\CmsPages\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\CmsPages\Page;
 use App\Models\RealEstate\Property;
+use Illuminate\Support\Facades\Cache;
 
 class PageController extends Controller
 {
@@ -35,12 +36,14 @@ class PageController extends Controller
 
         if ($withFeatured) {
             $count = (int) data_get($translation?->template_data, 'featured_properties.count', 6);
-            $featuredProperties = Property::query()
-                ->with(['translations', 'city.translations'])
-                ->published()
-                ->where('is_featured', true)
-                ->take(max(1, min(12, $count)))
-                ->get();
+            $featuredProperties = Cache::remember('home:featured_properties:'.$count, now()->addMinutes(10), function () use ($count) {
+                return Property::query()
+                    ->with(['translations', 'city.translations'])
+                    ->published()
+                    ->where('is_featured', true)
+                    ->take(max(1, min(12, $count)))
+                    ->get();
+            });
         }
 
         return view('cmspages::public.page', compact('page', 'translation', 'featuredProperties'));

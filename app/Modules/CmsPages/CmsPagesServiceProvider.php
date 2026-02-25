@@ -2,7 +2,9 @@
 
 namespace App\Modules\CmsPages;
 
+use App\Core\Sitemap\SitemapRegistry;
 use Illuminate\Support\ServiceProvider;
+use App\Modules\CmsPages\Sitemap\CmsPagesSitemapProvider;
 
 class CmsPagesServiceProvider extends ServiceProvider
 {
@@ -13,5 +15,7 @@ class CmsPagesServiceProvider extends ServiceProvider
         $this->loadRoutesFrom($base.'/routes/web.php');
         $this->loadRoutesFrom($base.'/routes/admin.php');
         $this->loadViewsFrom($base.'/resources/views', 'cmspages');
+
+        $this->app->make(SitemapRegistry::class)->register(new CmsPagesSitemapProvider());
     }
 }

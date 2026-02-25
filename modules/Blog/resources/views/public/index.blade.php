@@ -7,7 +7,6 @@
 @section('content')
 <h1 class="mb-4 text-3xl font-bold">Blog</h1>
 <div class="mb-4 flex flex-wrap gap-2 text-sm">
-    @php($categories = \App\Modules\Blog\Models\PostCategory::with('translations')->where('is_active',true)->orderBy('sort_order')->get())
     <a class="rounded bg-slate-100 px-3 py-1" href="{{ route('blog.index') }}">All</a>
     @foreach($categories as $category)
         <a class="rounded bg-slate-100 px-3 py-1" href="{{ route('blog.category', $category->slug) }}">{{ $category->translated()?->name }}</a>

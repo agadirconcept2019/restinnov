@@ -3,14 +3,28 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('meta_title', config('app.name'))</title>
-    <meta name="description" content="@yield('meta_description', 'RestInnov CMS')">
-    @if(trim($__env->yieldContent('canonical')) !== '')
-    <link rel="canonical" href="@yield('canonical')">
+    <title>@yield('meta_title', $seo['meta_title'] ?? config('app.name'))</title>
+    <meta name="description" content="@yield('meta_description', $seo['meta_description'] ?? 'RestInnov CMS')">
+    <link rel="canonical" href="{{ $seo['canonical_url'] ?? url()->current() }}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ $seo['og_title'] ?? ($seo['meta_title'] ?? config('app.name')) }}">
+    <meta property="og:description" content="{{ $seo['og_description'] ?? ($seo['meta_description'] ?? '') }}">
+    <meta property="og:url" content="{{ $seo['canonical_url'] ?? url()->current() }}">
+    @if(!empty($seo['og_image']))
+        <meta property="og:image" content="{{ $seo['og_image'] }}">
     @endif
-    @foreach(config('locales.supported', ['en','fr','es']) as $locale)
-        <link rel="alternate" hreflang="{{ $locale }}" href="{{ $locale === config('locales.default') ? url()->current() : url('/'.$locale.ltrim(parse_url(url()->current(), PHP_URL_PATH), '/')) }}">
+    <meta name="twitter:card" content="{{ $seo['twitter_card'] ?? 'summary_large_image' }}">
+    <meta name="twitter:title" content="{{ $seo['og_title'] ?? ($seo['meta_title'] ?? config('app.name')) }}">
+    <meta name="twitter:description" content="{{ $seo['og_description'] ?? ($seo['meta_description'] ?? '') }}">
+    <meta name="robots" content="{{ $seo['robots'] ?? 'index,follow' }}">
+    @foreach(($seo['hreflang'] ?? []) as $locale => $href)
+        <link rel="alternate" hreflang="{{ $locale }}" href="{{ $href }}">
     @endforeach
+    <link rel="alternate" hreflang="x-default" href="{{ ($seo['hreflang'][config('locales.default','en')] ?? ($seo['canonical_url'] ?? url()->current())) }}">
+    @if(!empty($seo['schema_json']))
+        <script type="application/ld+json">{!! json_encode($seo['schema_json'], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}</script>
+    @endif
+
     @if(!app()->environment('testing'))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif

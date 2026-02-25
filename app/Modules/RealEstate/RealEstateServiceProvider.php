@@ -2,7 +2,9 @@
 
 namespace App\Modules\RealEstate;
 
+use App\Core\Sitemap\SitemapRegistry;
 use Illuminate\Support\ServiceProvider;
+use App\Modules\RealEstate\Sitemap\RealEstateSitemapProvider;
 
 class RealEstateServiceProvider extends ServiceProvider
 {
@@ -13,5 +15,7 @@ class RealEstateServiceProvider extends ServiceProvider
         $this->loadRoutesFrom($base.'/routes/web.php');
         $this->loadRoutesFrom($base.'/routes/admin.php');
         $this->loadViewsFrom($base.'/resources/views', 'realestate');
+
+        $this->app->make(SitemapRegistry::class)->register(new RealEstateSitemapProvider());
     }
 }

@@ -13,5 +13,7 @@
     <a class="text-blue-600" href="{{ route('admin.cms-pages.pages.index') }}">Manage CMS Pages</a>
     <a class="text-blue-600" href="{{ route('admin.forms.submissions.index') }}">Manage Forms</a>
     <a class="text-blue-600" href="{{ route('admin.blog.posts.index') }}">Manage Blog</a>
+    <a class="text-blue-600" href="{{ route('admin.redirects.index') }}">Manage Redirects</a>
+    <a class="text-blue-600" href="{{ route('admin.audit-logs.index') }}">Audit Logs</a>
 </div>
 @endsection

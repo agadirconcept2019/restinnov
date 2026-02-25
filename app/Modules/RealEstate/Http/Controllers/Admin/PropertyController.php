@@ -2,6 +2,7 @@
 
 namespace App\Modules\RealEstate\Http\Controllers\Admin;
 
+use App\Core\Audit\AuditLogger;
 use App\Http\Controllers\Controller;
 use App\Models\RealEstate\Amenity;
 use App\Models\RealEstate\Area;
@@ -25,10 +26,11 @@ class PropertyController extends Controller
         return view('realestate::admin.properties.form', $this->formData(new Property()));
     }
 
-    public function store(StorePropertyRequest $request)
+    public function store(StorePropertyRequest $request, AuditLogger $auditLogger)
     {
         $property = Property::query()->create($this->propertyPayload($request->validated()) + ['created_by' => auth()->id(), 'updated_by' => auth()->id()]);
         $this->syncRelations($property, $request->validated());
+        $auditLogger->log($property->status === 'published' ? 'property.published' : 'property.created', $property, ['slug' => $property->slug]);
 
         return redirect()->route('admin.real-estate.properties.edit', $property)->with('status', 'Property created.');
     }
@@ -40,16 +42,18 @@ class PropertyController extends Controller
         return view('realestate::admin.properties.form', $this->formData($property));
     }
 
-    public function update(StorePropertyRequest $request, Property $property)
+    public function update(StorePropertyRequest $request, Property $property, AuditLogger $auditLogger)
     {
         $property->update($this->propertyPayload($request->validated()) + ['updated_by' => auth()->id()]);
         $this->syncRelations($property, $request->validated());
+        $auditLogger->log($property->status === 'published' ? 'property.published' : 'property.updated', $property, ['slug' => $property->slug]);
 
         return back()->with('status', 'Property updated.');
     }
 
-    public function destroy(Property $property)
+    public function destroy(Property $property, AuditLogger $auditLogger)
     {
+        $auditLogger->log('property.deleted', $property, ['slug' => $property->slug]);
         $property->delete();
 
         return redirect()->route('admin.real-estate.properties.index')->with('status', 'Property deleted.');

@@ -36,6 +36,7 @@ class CmsPagesAndFormsTest extends TestCase
             'subject_type' => 'owner',
             'message' => 'Hello',
             'company_name' => '',
+            'submitted_at' => time() - 5,
         ])->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('form_submissions', ['form_type' => 'contact', 'status' => 'new']);
@@ -50,6 +51,7 @@ class CmsPagesAndFormsTest extends TestCase
             'email' => 'quote@example.com',
             'message' => 'Need quote',
             'company_name' => '',
+            'submitted_at' => time() - 5,
         ])->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('form_submissions', ['form_type' => 'quote']);
@@ -66,6 +68,7 @@ class CmsPagesAndFormsTest extends TestCase
             'subject_type' => 'other',
             'message' => 'spam',
             'company_name' => 'bot-filled',
+            'submitted_at' => time() - 5,
         ])->assertSessionHasErrors(['company_name']);
     }
 
