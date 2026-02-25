@@ -12,7 +12,17 @@ class EnsureUserHasPermission
     {
         $user = $request->user();
 
-        abort_unless($user && $user->hasPermission($permission), 403);
+        if (! $user) {
+            abort(403);
+        }
+
+        if (str_starts_with($permission, 'role:')) {
+            abort_unless($user->hasRole(substr($permission, 5)), 403);
+
+            return $next($request);
+        }
+
+        abort_unless($user->hasPermission($permission), 403);
 
         return $next($request);
     }

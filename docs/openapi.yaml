@@ -1,0 +1,140 @@
+openapi: 3.0.3
+info:
+  title: RestInnov CMS API V1
+  version: 1.0.0
+servers:
+  - url: /api
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: API Token
+  schemas:
+    Property:
+      type: object
+      properties:
+        slug: { type: string }
+        title: { type: string }
+        status: { type: string }
+        city: { type: string }
+        type: { type: string }
+        max_guests: { type: integer }
+        base_price_per_night: { type: number, format: float }
+paths:
+  /auth/token:
+    post:
+      summary: Issue API token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+                device_name: { type: string }
+      responses:
+        '200': { description: Token issued }
+        '422': { description: Invalid credentials }
+  /auth/logout:
+    post:
+      summary: Revoke current token
+      security:
+        - bearerAuth: []
+      responses:
+        '200': { description: Logged out }
+  /v1/properties:
+    get:
+      summary: List published properties
+      parameters:
+        - in: query
+          name: locale
+          schema: { type: string, enum: [en, fr, es] }
+        - in: query
+          name: city
+          schema: { type: string }
+        - in: query
+          name: type
+          schema: { type: string }
+        - in: query
+          name: guests
+          schema: { type: integer }
+        - in: query
+          name: price_min
+          schema: { type: number }
+        - in: query
+          name: price_max
+          schema: { type: number }
+        - in: query
+          name: checkin_date
+          schema: { type: string, format: date }
+        - in: query
+          name: checkout_date
+          schema: { type: string, format: date }
+        - in: query
+          name: amenities
+          schema: { type: string, description: "comma-separated amenity names" }
+      responses:
+        '200':
+          description: Paginated properties
+  /v1/properties/{slug}:
+    get:
+      summary: Property details
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Property payload }
+        '404': { description: Not found }
+  /v1/blog/posts:
+    get:
+      summary: List published posts
+      responses:
+        '200': { description: Paginated posts }
+  /v1/blog/posts/{slug}:
+    get:
+      summary: Get published post by slug
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Post payload }
+        '404': { description: Not found }
+  /v1/pages/{slug}:
+    get:
+      summary: Get published page by slug
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Page payload }
+        '404': { description: Not found }
+  /v1/admin/properties:
+    get:
+      summary: Admin list properties
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: Paginated properties }
+        '403': { description: Forbidden }
+    post:
+      summary: Admin create property
+      security: [{ bearerAuth: [] }]
+      responses:
+        '201': { description: Created }
+        '403': { description: Forbidden }
+  /v1/owner/properties:
+    get:
+      summary: Owner list own properties
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: Paginated owner properties }
+        '403': { description: Forbidden }

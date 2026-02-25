@@ -30,6 +30,9 @@ class AppServiceProvider extends ServiceProvider
     {
         RateLimiter::for('admin-login', fn (Request $request) => Limit::perMinute(5)->by($request->ip().'|'.strtolower((string) $request->input('email'))));
         RateLimiter::for('forms-public', fn (Request $request) => Limit::perMinute(10)->by($request->ip()));
+        RateLimiter::for('api-auth', fn (Request $request) => Limit::perMinute(5)->by($request->ip().'|'.strtolower((string) $request->input('email'))));
+        RateLimiter::for('api-public', fn (Request $request) => Limit::perMinute(120)->by($request->ip()));
+        RateLimiter::for('api-private', fn (Request $request) => Limit::perMinute(90)->by(($request->user()?->id ?: 'guest').'|'.$request->ip()));
 
         View::composer('layouts.public', function ($view) use ($seoManager) {
             $view->with('seo', $seoManager->resolveForRequest(request()));
