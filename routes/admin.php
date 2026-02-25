@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\Access\PermissionController;
 use App\Http\Controllers\Admin\Access\RoleController;
 use App\Http\Controllers\Admin\AuditLogController;
+use App\Http\Controllers\Admin\Core\AdminProductivityController;
 use App\Http\Controllers\Admin\Core\MediaController;
 use App\Http\Controllers\Admin\Core\MenuController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -44,5 +45,13 @@ Route::middleware('web')->prefix('admin')->name('admin.')->group(function () {
 
         Route::get('/menus', [MenuController::class, 'index'])->middleware('permission:menus.manage')->name('menus.index');
         Route::post('/menus/{menu}/reorder', [MenuController::class, 'reorder'])->middleware('permission:menus.manage')->name('menus.reorder');
+
+        Route::post('/saved-views', [AdminProductivityController::class, 'saveView'])->name('saved-views.store');
+        Route::post('/saved-views/{view}/apply', [AdminProductivityController::class, 'applyView'])->name('saved-views.apply');
+        Route::delete('/saved-views/{view}', [AdminProductivityController::class, 'deleteView'])->name('saved-views.destroy');
+
+        Route::post('/exports/queue', [AdminProductivityController::class, 'queueExport'])->middleware('permission:admin.exports.run')->name('exports.queue');
+        Route::get('/exports', [AdminProductivityController::class, 'exports'])->middleware('permission:admin.exports.run')->name('exports.index');
+        Route::get('/exports/{run}/download', [AdminProductivityController::class, 'downloadExport'])->middleware('permission:admin.exports.run')->name('exports.download');
     });
 });

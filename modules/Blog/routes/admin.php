@@ -8,6 +8,7 @@ Route::middleware(['web', 'auth'])->prefix('admin/blog')->name('admin.blog.')->g
     Route::get('/posts', [PostController::class, 'index'])->middleware('permission:blog.posts.view')->name('posts.index');
     Route::get('/posts/create', [PostController::class, 'create'])->middleware('permission:blog.posts.create')->name('posts.create');
     Route::post('/posts', [PostController::class, 'store'])->middleware('permission:blog.posts.create')->name('posts.store');
+    Route::post('/posts/bulk', [PostController::class, 'bulk'])->middleware('permission:blog.posts.publish')->name('posts.bulk');
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->middleware('permission:blog.posts.update')->name('posts.edit');
     Route::put('/posts/{post}', [PostController::class, 'update'])->middleware('permission:blog.posts.update')->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->middleware('permission:blog.posts.delete')->name('posts.destroy');

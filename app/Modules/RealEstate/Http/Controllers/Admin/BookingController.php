@@ -2,25 +2,45 @@
 
 namespace App\Modules\RealEstate\Http\Controllers\Admin;
 
+use App\Core\AdminTable\AdminTableQuery;
+use App\Core\Audit\AuditLogger;
 use App\Http\Controllers\Controller;
 use App\Models\RealEstate\Booking;
 use App\Modules\Communications\Models\EmailLog;
 use App\Modules\RealEstate\Services\BookingService;
 use App\Modules\RealEstate\Services\InvoicePdfService;
+use Illuminate\Http\Request;
 
 class BookingController extends Controller
 {
-    public function index()
+    public function index(AdminTableQuery $adminTableQuery)
     {
-        $bookings = Booking::query()
-            ->with('property.translations', 'invoice')
-            ->when(request('status'), fn ($q, $v) => $q->where('status', $v))
-            ->when(request('email'), fn ($q, $v) => $q->where('guest_email', 'like', "%{$v}%"))
-            ->latest()
-            ->paginate(20)
-            ->withQueryString();
+        $query = Booking::query()->with('property.translations', 'invoice');
+        $bookings = $adminTableQuery->apply($query, [
+            'search' => ['guest_email', 'guest_full_name'],
+            'filters' => [
+                'status' => fn ($q, $v) => $q->where('status', $v),
+            ],
+            'sorts' => ['id', 'created_at', 'total', 'status'],
+            'default_sort' => 'created_at',
+            'default_dir' => 'desc',
+        ])->paginate(20)->withQueryString();
 
         return view('realestate::admin.bookings.index', compact('bookings'));
+    }
+
+    public function bulk(Request $request, AuditLogger $auditLogger)
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'exists:bookings,id'],
+            'status' => ['required', 'in:pending,confirmed,canceled'],
+        ]);
+
+        Booking::query()->whereIn('id', $data['ids'])->update(['status' => $data['status']]);
+        $auditLogger->log('realestate.bookings.bulk_status', null, ['status' => $data['status'], 'count' => count($data['ids'])]);
+
+        return back()->with('status', 'Bookings updated.');
     }
 
     public function show(Booking $booking)

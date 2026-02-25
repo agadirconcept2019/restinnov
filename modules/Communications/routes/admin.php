@@ -13,4 +13,5 @@ Route::middleware(['web', 'auth'])->prefix('admin/communications')->name('admin.
     Route::get('/logs', [EmailLogController::class, 'index'])->middleware('permission:communications.logs.view')->name('logs.index');
     Route::get('/logs/{log}', [EmailLogController::class, 'show'])->middleware('permission:communications.logs.view')->name('logs.show');
     Route::post('/logs/{log}/retry', [EmailLogController::class, 'retry'])->middleware(['permission:communications.logs.retry', 'throttle:forms-public'])->name('logs.retry');
+    Route::post('/logs/bulk', [EmailLogController::class, 'bulk'])->middleware(['permission:communications.logs.retry', 'throttle:forms-public'])->name('logs.bulk');
 });

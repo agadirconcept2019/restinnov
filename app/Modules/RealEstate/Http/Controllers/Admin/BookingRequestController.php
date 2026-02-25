@@ -2,6 +2,7 @@
 
 namespace App\Modules\RealEstate\Http\Controllers\Admin;
 
+use App\Core\AdminTable\AdminTableQuery;
 use App\Core\Audit\AuditLogger;
 use App\Http\Controllers\Controller;
 use App\Models\RealEstate\BookingRequest;
@@ -11,16 +12,34 @@ use Illuminate\Validation\Rule;
 
 class BookingRequestController extends Controller
 {
-    public function index()
+    public function index(AdminTableQuery $adminTableQuery)
     {
-        $bookingRequests = BookingRequest::query()
-            ->with('property.translations')
-            ->when(request('status'), fn ($q, $v) => $q->where('status', $v))
-            ->latest()
-            ->paginate(20)
-            ->withQueryString();
+        $query = BookingRequest::query()->with('property.translations');
+        $bookingRequests = $adminTableQuery->apply($query, [
+            'search' => ['guest_email', 'guest_full_name'],
+            'filters' => [
+                'status' => fn ($q, $v) => $q->where('status', $v),
+            ],
+            'sorts' => ['id', 'created_at', 'status', 'checkin_date'],
+            'default_sort' => 'created_at',
+            'default_dir' => 'desc',
+        ])->paginate(20)->withQueryString();
 
         return view('realestate::admin.booking-requests.index', compact('bookingRequests'));
+    }
+
+    public function bulk(Request $request, AuditLogger $auditLogger)
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'exists:booking_requests,id'],
+            'status' => ['required', 'in:pending,rejected,canceled,expired'],
+        ]);
+
+        BookingRequest::query()->whereIn('id', $data['ids'])->update(['status' => $data['status']]);
+        $auditLogger->log('realestate.booking_requests.bulk_status', null, ['status' => $data['status'], 'count' => count($data['ids'])]);
+
+        return back()->with('status', 'Booking requests updated.');
     }
 
     public function show(BookingRequest $bookingRequest)

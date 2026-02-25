@@ -13,9 +13,33 @@ class PageController extends Controller
 {
     public function index()
     {
-        $pages = Page::query()->with('translations')->latest()->paginate(20);
+        $pages = Page::query()->with('translations')
+            ->when(request('status'), fn ($q, $v) => $q->where('status', $v))
+            ->when(request('locale'), fn ($q, $v) => $q->whereHas('translations', fn ($sq) => $sq->where('locale', $v)))
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
 
         return view('cmspages::admin.pages.index', compact('pages'));
+    }
+
+    public function bulk(\Illuminate\Http\Request $request, AuditLogger $auditLogger)
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'exists:pages,id'],
+            'action' => ['required', 'in:publish,unpublish'],
+        ]);
+
+        Page::query()->whereIn('id', $data['ids'])->update([
+            'status' => $data['action'] === 'publish' ? 'published' : 'draft',
+            'published_at' => $data['action'] === 'publish' ? now() : null,
+            'updated_by' => auth()->id(),
+        ]);
+
+        $auditLogger->log('cms.pages.bulk', null, ['action' => $data['action'], 'count' => count($data['ids'])]);
+
+        return back()->with('status', 'Bulk pages action applied.');
     }
 
     public function create()

@@ -18,6 +18,7 @@ class PostController extends Controller
             ->with(['translations', 'categories.translations'])
             ->when(request('status'), fn ($q, $v) => $q->where('status', $v))
             ->when(request('category'), fn ($q, $v) => $q->whereHas('categories', fn ($sq) => $sq->where('slug', $v)))
+            ->when(request('locale'), fn ($q, $v) => $q->whereHas('translations', fn ($sq) => $sq->where('locale', $v)))
             ->latest()
             ->paginate(20)
             ->withQueryString();
@@ -25,6 +26,24 @@ class PostController extends Controller
         $categories = PostCategory::query()->with('translations')->get();
 
         return view('blog::admin.posts.index', compact('posts', 'categories'));
+    }
+
+    public function bulk(\Illuminate\Http\Request $request, AuditLogger $auditLogger)
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'exists:posts,id'],
+            'action' => ['required', 'in:publish,unpublish'],
+        ]);
+
+        Post::query()->whereIn('id', $data['ids'])->update([
+            'status' => $data['action'] === 'publish' ? 'published' : 'draft',
+            'published_at' => $data['action'] === 'publish' ? now() : null,
+        ]);
+
+        $auditLogger->log('blog.posts.bulk', null, ['action' => $data['action'], 'count' => count($data['ids'])]);
+
+        return back()->with('status', 'Bulk posts action applied.');
     }
 
     public function create()
