@@ -4,8 +4,9 @@ namespace App\Modules\RealEstate\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\RealEstate\Booking;
+use App\Modules\Communications\Models\EmailLog;
 use App\Modules\RealEstate\Services\BookingService;
-use Illuminate\Http\Request;
+use App\Modules\RealEstate\Services\InvoicePdfService;
 
 class BookingController extends Controller
 {
@@ -25,8 +26,17 @@ class BookingController extends Controller
     public function show(Booking $booking)
     {
         $booking->load('property.translations', 'items', 'invoice');
+        $communicationLogs = EmailLog::query()
+            ->where(function ($q) use ($booking) {
+                $q->where(fn ($sq) => $sq->where('related_type', 'booking')->where('related_id', $booking->id));
+                if ($booking->invoice) {
+                    $q->orWhere(fn ($sq) => $sq->where('related_type', 'invoice')->where('related_id', $booking->invoice->id));
+                }
+            })
+            ->latest()
+            ->get();
 
-        return view('realestate::admin.bookings.show', compact('booking'));
+        return view('realestate::admin.bookings.show', compact('booking', 'communicationLogs'));
     }
 
     public function cancel(Booking $booking, BookingService $bookingService)
@@ -36,6 +46,13 @@ class BookingController extends Controller
         return back()->with('status', 'Booking canceled.');
     }
 
+    public function resend(Booking $booking, BookingService $bookingService)
+    {
+        $bookingService->resendConfirmation($booking);
+
+        return back()->with('status', 'Confirmation email queued.');
+    }
+
     public function invoice(Booking $booking)
     {
         $booking->load('invoice', 'property.translations');
@@ -43,10 +60,10 @@ class BookingController extends Controller
         return view('realestate::admin.bookings.invoice', compact('booking'));
     }
 
-    public function invoiceDownload(Booking $booking)
+    public function invoiceDownload(Booking $booking, InvoicePdfService $invoicePdfService)
     {
         $booking->load('invoice', 'property.translations');
 
-        return response()->view('realestate::admin.bookings.invoice', compact('booking'));
+        return $invoicePdfService->download($booking->invoice);
     }
 }

@@ -11,5 +11,6 @@ return [
         'forms',
         'owner-portal',
         'migration-tools',
+        'communications',
     ],
 ];

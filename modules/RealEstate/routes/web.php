@@ -3,6 +3,7 @@
 use App\Modules\RealEstate\Http\Controllers\Public\BookingRequestPublicController;
 use App\Modules\RealEstate\Http\Controllers\Public\InquiryPublicController;
 use App\Modules\RealEstate\Http\Controllers\Public\PropertyIcsController;
+use App\Modules\RealEstate\Http\Controllers\Client\ClientAccessController;
 use App\Modules\RealEstate\Http\Controllers\Public\PropertyPublicController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,4 +27,10 @@ Route::middleware(['web','set.locale'])->group(function () {
         Route::get('/city/{citySlug}', [PropertyPublicController::class, 'city']);
         Route::get('/area/{areaSlug}', [PropertyPublicController::class, 'area']);
     });
+});
+
+
+Route::middleware(['web', 'signed', 'throttle:forms-public'])->group(function () {
+    Route::get('/client/bookings/{booking}/summary', [ClientAccessController::class, 'bookingSummary'])->name('realestate.client.booking.summary');
+    Route::get('/client/invoices/{invoice}/download', [ClientAccessController::class, 'invoiceDownload'])->name('realestate.client.invoice.download');
 });

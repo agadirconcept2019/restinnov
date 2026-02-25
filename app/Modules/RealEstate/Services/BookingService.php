@@ -4,12 +4,11 @@ namespace App\Modules\RealEstate\Services;
 
 use App\Core\Audit\AuditLogger;
 use App\Core\Lock\LockService;
-use App\Jobs\SendTemplatedEmailJob;
+use App\Modules\Communications\Services\EmailDispatcher;
 use App\Models\RealEstate\Booking;
 use App\Models\RealEstate\BookingRequest;
 use App\Models\RealEstate\Invoice;
 use App\Models\RealEstate\PropertyAvailability;
-use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 
 class BookingService
@@ -17,6 +16,7 @@ class BookingService
     public function __construct(
         private readonly LockService $lockService,
         private readonly AuditLogger $auditLogger,
+        private readonly EmailDispatcher $emailDispatcher,
     ) {
     }
 
@@ -104,21 +104,21 @@ class BookingService
 
                 $this->auditLogger->log('realestate.booking.confirmed', $booking, ['booking_request_id' => $lockedRequest->id, 'invoice_id' => $invoice->id]);
 
-                rescue(function () use ($booking, $invoice) {
-                    Bus::dispatch(new SendTemplatedEmailJob(
-                        $booking->guest_email,
-                        'booking.confirmed',
-                        [
-                            'property_title' => $booking->property->translated()?->title ?? $booking->property->slug,
-                            'checkin' => $booking->checkin_date->toDateString(),
-                            'checkout' => $booking->checkout_date->toDateString(),
-                            'nights' => $booking->nights,
-                            'total' => $booking->total,
-                            'invoice_number' => $invoice->invoice_number,
-                        ],
-                        $booking->locale,
-                    ));
-                }, report: false);
+                $this->emailDispatcher->queue(
+                    $booking->guest_email,
+                    'booking.confirmed',
+                    [
+                        'property_title' => $booking->property->translated()?->title ?? $booking->property->slug,
+                        'checkin' => $booking->checkin_date->toDateString(),
+                        'checkout' => $booking->checkout_date->toDateString(),
+                        'nights' => $booking->nights,
+                        'total' => $booking->total,
+                        'invoice_number' => $invoice->invoice_number,
+                    ],
+                    $booking->locale,
+                    'booking',
+                    $booking->id,
+                );
 
                 return $booking->fresh(['items', 'invoice']);
             });
@@ -146,13 +146,34 @@ class BookingService
 
             $this->auditLogger->log('realestate.booking.canceled', $locked, []);
 
-            rescue(fn () => Bus::dispatch(new SendTemplatedEmailJob($locked->guest_email, 'booking.canceled', [
+            $this->emailDispatcher->queue($locked->guest_email, 'booking.canceled', [
                 'checkin' => $locked->checkin_date->toDateString(),
                 'checkout' => $locked->checkout_date->toDateString(),
-            ], $locked->locale)), report: false);
+            ], $locked->locale, 'booking', $locked->id);
 
             return $locked->fresh();
         });
+    }
+
+    public function resendConfirmation(Booking $booking): void
+    {
+        $booking->loadMissing('invoice', 'property.translations');
+
+        $this->emailDispatcher->queue(
+            $booking->guest_email,
+            'booking.confirmed',
+            [
+                'property_title' => $booking->property->translated()?->title ?? $booking->property->slug,
+                'checkin' => $booking->checkin_date->toDateString(),
+                'checkout' => $booking->checkout_date->toDateString(),
+                'nights' => $booking->nights,
+                'total' => $booking->total,
+                'invoice_number' => $booking->invoice?->invoice_number ?? 'N/A',
+            ],
+            $booking->locale,
+            'booking',
+            $booking->id,
+        );
     }
 
     private function nextInvoiceNumber(): string

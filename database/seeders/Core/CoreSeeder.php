@@ -50,13 +50,13 @@ class CoreSeeder extends Seeder
             );
         }
 
-        foreach (['core', 'real-estate', 'cms-pages', 'blog', 'forms', 'owner-portal', 'migration-tools'] as $slug) {
+        foreach (['core', 'real-estate', 'cms-pages', 'blog', 'forms', 'owner-portal', 'migration-tools', 'communications'] as $slug) {
             Module::query()->updateOrCreate(
                 ['slug' => $slug],
                 [
                     'name' => str($slug)->replace('-', ' ')->title()->toString(),
                     'version' => '1.0.0',
-                    'is_enabled' => in_array($slug, ['core', 'real-estate', 'cms-pages', 'blog', 'forms', 'owner-portal', 'migration-tools'], true),
+                    'is_enabled' => in_array($slug, ['core', 'real-estate', 'cms-pages', 'blog', 'forms', 'owner-portal', 'migration-tools', 'communications'], true),
                     'installed_at' => now(),
                     'meta' => ['source' => 'core-seeder'],
                 ],

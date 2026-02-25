@@ -26,6 +26,7 @@ Route::middleware(['web','auth'])->prefix('admin/real-estate')->name('admin.real
     Route::get('bookings', [BookingController::class, 'index'])->name('bookings.index');
     Route::get('bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
     Route::post('bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
+    Route::post('bookings/{booking}/resend', [BookingController::class, 'resend'])->middleware('throttle:forms-public')->name('bookings.resend');
     Route::get('bookings/{booking}/invoice', [BookingController::class, 'invoice'])->name('bookings.invoice');
     Route::get('bookings/{booking}/invoice/download', [BookingController::class, 'invoiceDownload'])->name('bookings.invoice.download');
 

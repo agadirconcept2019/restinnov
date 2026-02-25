@@ -6,6 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class EmailTemplate extends Model
 {
-    protected $fillable = ['key', 'locale', 'subject', 'body_html', 'is_active'];
+    protected $fillable = ['key', 'locale', 'subject', 'body_html', 'is_active', 'updated_by'];
     protected $casts = ['is_active' => 'boolean'];
 }
