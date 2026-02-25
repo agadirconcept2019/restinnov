@@ -10,5 +10,6 @@ return [
         'blog',
         'forms',
         'owner-portal',
+        'migration-tools',
     ],
 ];

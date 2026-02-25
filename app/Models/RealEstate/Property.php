@@ -32,6 +32,7 @@ class Property extends Model
     public function owner(){ return $this->belongsTo(\App\Models\User::class, 'owner_user_id'); }
     public function bookingRequests(){ return $this->hasMany(BookingRequest::class); }
     public function icalFeeds(){ return $this->hasMany(PropertyIcalFeed::class); }
+    public function bookings(){ return $this->hasMany(Booking::class); }
 
     public function translated(?string $locale = null): ?PropertyTranslation
     {

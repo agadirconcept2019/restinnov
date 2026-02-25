@@ -21,4 +21,9 @@ class BookingRequest extends Model
     {
         return $this->belongsTo(Property::class);
     }
+
+    public function booking()
+    {
+        return $this->hasOne(Booking::class);
+    }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\RealEstate\Http\Controllers\Admin\AvailabilityController;
+use App\Modules\RealEstate\Http\Controllers\Admin\BookingController;
 use App\Modules\RealEstate\Http\Controllers\Admin\BookingRequestController;
 use App\Modules\RealEstate\Http\Controllers\Admin\IcalFeedController;
 use App\Modules\RealEstate\Http\Controllers\Admin\InquiryController;
@@ -21,6 +22,12 @@ Route::middleware(['web','auth'])->prefix('admin/real-estate')->name('admin.real
     Route::get('booking-requests', [BookingRequestController::class, 'index'])->name('booking-requests.index');
     Route::get('booking-requests/{bookingRequest}', [BookingRequestController::class, 'show'])->name('booking-requests.show');
     Route::post('booking-requests/{bookingRequest}/status', [BookingRequestController::class, 'updateStatus'])->name('booking-requests.status');
+
+    Route::get('bookings', [BookingController::class, 'index'])->name('bookings.index');
+    Route::get('bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
+    Route::post('bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
+    Route::get('bookings/{booking}/invoice', [BookingController::class, 'invoice'])->name('bookings.invoice');
+    Route::get('bookings/{booking}/invoice/download', [BookingController::class, 'invoiceDownload'])->name('bookings.invoice.download');
 
     Route::get('ical-feeds', [IcalFeedController::class, 'index'])->name('ical-feeds.index');
     Route::post('ical-feeds', [IcalFeedController::class, 'store'])->name('ical-feeds.store');

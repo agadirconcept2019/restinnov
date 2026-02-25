@@ -2,6 +2,7 @@
 
 namespace Database\Seeders\Core;
 
+use App\Models\Core\EmailTemplate;
 use App\Models\Core\Locale;
 use App\Models\Core\Module;
 use App\Models\Core\Setting;
@@ -38,13 +39,24 @@ class CoreSeeder extends Seeder
             );
         }
 
-        foreach (['core', 'real-estate', 'cms-pages', 'blog', 'forms', 'owner-portal'] as $slug) {
+
+        foreach ([
+            ['key' => 'booking.confirmed', 'locale' => 'en', 'subject' => 'Booking confirmed {invoice_number}', 'body_html' => '<p>Your booking for {property_title} is confirmed from {checkin} to {checkout}. Total: {total}.</p>'],
+            ['key' => 'booking.canceled', 'locale' => 'en', 'subject' => 'Booking canceled', 'body_html' => '<p>Your booking from {checkin} to {checkout} has been canceled.</p>'],
+        ] as $template) {
+            EmailTemplate::query()->updateOrCreate(
+                ['key' => $template['key'], 'locale' => $template['locale']],
+                ['subject' => $template['subject'], 'body_html' => $template['body_html'], 'is_active' => true],
+            );
+        }
+
+        foreach (['core', 'real-estate', 'cms-pages', 'blog', 'forms', 'owner-portal', 'migration-tools'] as $slug) {
             Module::query()->updateOrCreate(
                 ['slug' => $slug],
                 [
                     'name' => str($slug)->replace('-', ' ')->title()->toString(),
                     'version' => '1.0.0',
-                    'is_enabled' => in_array($slug, ['core', 'real-estate', 'cms-pages', 'blog', 'forms', 'owner-portal'], true),
+                    'is_enabled' => in_array($slug, ['core', 'real-estate', 'cms-pages', 'blog', 'forms', 'owner-portal', 'migration-tools'], true),
                     'installed_at' => now(),
                     'meta' => ['source' => 'core-seeder'],
                 ],

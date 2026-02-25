@@ -10,7 +10,7 @@ use App\Modules\OwnerPortal\Http\Requests\Owner\UpdateOwnerBookingStatusRequest;
 use App\Modules\OwnerPortal\Jobs\SendOwnerPortalMailJob;
 use App\Modules\OwnerPortal\Models\CrmNote;
 use App\Modules\OwnerPortal\Support\OwnerAccess;
-use App\Modules\RealEstate\Services\AvailabilityServiceV2;
+use App\Modules\RealEstate\Services\BookingService;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 
@@ -42,25 +42,24 @@ class BookingRequestController extends Controller
         return view('ownerportal::owner.booking-requests.show', compact('bookingRequest', 'notes'));
     }
 
-    public function status(UpdateOwnerBookingStatusRequest $request, BookingRequest $bookingRequest, AvailabilityServiceV2 $availabilityService, AuditLogger $auditLogger)
+    public function status(UpdateOwnerBookingStatusRequest $request, BookingRequest $bookingRequest, BookingService $bookingService, AuditLogger $auditLogger)
     {
         $this->ensureOwnsProperty($bookingRequest->property);
 
-        DB::transaction(function () use ($request, $bookingRequest, $availabilityService, $auditLogger) {
-            $status = $request->string('status')->value();
-            $bookingRequest->update(['status' => $status]);
+        $status = $request->string('status')->value();
 
+        try {
             if ($status === 'confirmed') {
-                $availabilityService->bulkUpdate(
-                    $bookingRequest->property_id,
-                    $bookingRequest->checkin_date->format('Y-m-d'),
-                    $bookingRequest->checkout_date->copy()->subDay()->format('Y-m-d'),
-                    ['status' => 'booked'],
-                );
+                $bookingService->confirmFromRequest($bookingRequest);
+            } else {
+                DB::transaction(function () use ($bookingRequest, $status, $auditLogger) {
+                    $bookingRequest->update(['status' => $status]);
+                    $auditLogger->log('owner.booking.status_changed', $bookingRequest, ['status' => $status]);
+                });
             }
-
-            $auditLogger->log('owner.booking.status_changed', $bookingRequest, ['status' => $status]);
-        });
+        } catch (\RuntimeException $exception) {
+            return back()->withErrors(['status' => $exception->getMessage()]);
+        }
 
         try {
             Bus::dispatch(new SendOwnerPortalMailJob($bookingRequest->email, 'Booking request update', 'Your booking request status is now '.$bookingRequest->status.'.'));
