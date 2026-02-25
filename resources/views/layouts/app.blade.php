@@ -8,7 +8,7 @@
 <body class="bg-slate-50 text-slate-900">
 <header class="border-b bg-white">
     <div class="mx-auto flex max-w-6xl items-center justify-between p-4">
-        <a href="{{ route('home') }}" class="font-bold">{{ config('app.name') }}</a>
+        <a href="{{ route('cms.home') }}" class="font-bold">{{ config('app.name') }}</a>
         <nav class="flex gap-3 text-sm">
             <a href="{{ route('properties.index') }}">Our Properties</a>
             <a href="{{ route('services') }}">Services</a>

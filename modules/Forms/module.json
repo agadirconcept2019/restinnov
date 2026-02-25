@@ -2,5 +2,7 @@
   "name": "Forms",
   "slug": "forms",
   "version": "1.0.0",
-  "providers": []
+  "providers": [
+    "App\\Modules\\Forms\\FormsServiceProvider"
+  ]
 }

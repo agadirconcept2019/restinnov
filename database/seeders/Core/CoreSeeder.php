@@ -28,6 +28,7 @@ class CoreSeeder extends Seeder
             ['group' => 'site', 'key' => 'site_name', 'value' => 'RestInnov CMS', 'type' => 'string'],
             ['group' => 'site', 'key' => 'default_locale', 'value' => 'en', 'type' => 'string'],
             ['group' => 'site', 'key' => 'support_email', 'value' => 'support@example.com', 'type' => 'string'],
+            ['group' => 'forms', 'key' => 'captcha_enabled', 'value' => false, 'type' => 'boolean'],
         ];
 
         foreach ($settings as $setting) {

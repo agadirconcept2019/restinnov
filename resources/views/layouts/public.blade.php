@@ -3,7 +3,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name') }}</title>
+    <title>@yield('meta_title', config('app.name'))</title>
+    <meta name="description" content="@yield('meta_description', 'RestInnov CMS')">
+    @if(trim($__env->yieldContent('canonical')) !== '')
+    <link rel="canonical" href="@yield('canonical')">
+    @endif
+    @foreach(config('locales.supported', ['en','fr','es']) as $locale)
+        <link rel="alternate" hreflang="{{ $locale }}" href="{{ $locale === config('locales.default') ? url()->current() : url('/'.$locale.ltrim(parse_url(url()->current(), PHP_URL_PATH), '/')) }}">
+    @endforeach
     @if(!app()->environment('testing'))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
@@ -11,7 +18,7 @@
 <body class="bg-slate-50 text-slate-900">
 <header class="border-b bg-white">
     <div class="mx-auto flex max-w-6xl items-center justify-between p-4">
-        <a href="{{ route('home') }}" class="font-semibold">{{ config('app.name') }}</a>
+        <a href="{{ route('cms.home') }}" class="font-semibold">{{ config('app.name') }}</a>
         <div class="flex items-center gap-2 text-sm">
             @foreach($supportedLocales ?? config('locales.supported') as $locale)
                 <a class="rounded px-2 py-1 {{ app()->getLocale()===$locale?'bg-slate-900 text-white':'bg-slate-100' }}" href="{{ $locale === config('locales.default') ? url('/') : url('/'.$locale) }}">{{ strtoupper($locale) }}</a>
