@@ -9,8 +9,8 @@ class InstallGuard
 {
     public function handle(Request $request, Closure $next)
     {
-        if (file_exists(storage_path('app/install.lock')) && $request->is('install*')) {
-            return redirect()->route('home');
+        if ($request->is('install*') && file_exists(storage_path('app/install.lock'))) {
+            return redirect()->route('admin.login');
         }
 
         return $next($request);

@@ -21,7 +21,7 @@ class LoginController extends Controller
         ]);
 
         if (! Auth::attempt($credentials, true)) {
-            return back()->withErrors(['email' => 'Invalid credentials']);
+            return back()->withErrors(['email' => 'Identifiants invalides.']);
         }
 
         $request->session()->regenerate();
@@ -35,6 +35,6 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('home');
+        return redirect()->route('admin.login');
     }
 }

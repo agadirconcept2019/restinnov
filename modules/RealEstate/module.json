@@ -2,9 +2,5 @@
   "name": "Real Estate",
   "slug": "real-estate",
   "version": "1.0.0",
-  "description": "Property management and listing module",
-  "providers": [],
-  "requires": "^1.0",
-  "routes": {"web": true, "admin": true, "api": false},
-  "permissions": ["properties.view", "properties.manage", "inquiries.manage"]
+  "providers": []
 }

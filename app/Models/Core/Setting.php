@@ -9,7 +9,7 @@ class Setting extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['key', 'value', 'group'];
+    protected $fillable = ['group', 'key', 'value', 'type'];
 
     protected function casts(): array
     {

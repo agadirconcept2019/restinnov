@@ -7,11 +7,12 @@ use Tests\TestCase;
 
 class ModuleManifestRepositoryTest extends TestCase
 {
-    public function test_it_loads_module_manifests(): void
+    public function test_module_manifest_repository_loads_valid_manifests(): void
     {
         $modules = app(ModuleManifestRepository::class)->all();
 
-        $this->assertTrue($modules->has('real-estate'));
         $this->assertTrue($modules->has('cms-pages'));
+        $this->assertTrue($modules->has('blog'));
+        $this->assertTrue($modules->has('forms'));
     }
 }

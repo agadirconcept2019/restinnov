@@ -10,11 +10,11 @@ class SettingsServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_it_reads_from_cacheable_settings_store(): void
+    public function test_settings_service_stores_and_reads_values(): void
     {
         $service = app(SettingsService::class);
-        $service->put('site_name', 'Rest Innov');
+        $service->put('site', 'site_name', 'RestInnov');
 
-        $this->assertSame('Rest Innov', $service->get('site_name'));
+        $this->assertSame('RestInnov', $service->get('site', 'site_name'));
     }
 }

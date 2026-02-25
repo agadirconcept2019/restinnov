@@ -1,7 +1,11 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
-<h1 class="text-2xl font-bold">Admin dashboard</h1>
-<p>Shell d'administration prêt à être étendu par les modules.</p>
-<form method="post" action="{{ route('logout') }}" class="mt-4">@csrf<button class="rounded bg-red-600 px-3 py-2 text-white">Logout</button></form>
+<h2 class="mb-4 text-2xl font-semibold">Dashboard</h2>
+<div class="grid gap-4 md:grid-cols-4">
+    <div class="rounded border bg-white p-4"><div class="text-sm text-slate-500">Install lock</div><div class="font-semibold">{{ $installLocked ? 'Actif' : 'Absent' }}</div></div>
+    <div class="rounded border bg-white p-4"><div class="text-sm text-slate-500">Modules</div><div class="font-semibold">{{ $enabledModulesCount }}/{{ $modulesCount }}</div></div>
+    <div class="rounded border bg-white p-4"><div class="text-sm text-slate-500">Locale courante</div><div class="font-semibold">{{ $locale }}</div></div>
+    <div class="rounded border bg-white p-4"><div class="text-sm text-slate-500">Liens rapides</div><div class="font-semibold"><a class="text-blue-600" href="{{ route('home') }}">Voir le site</a></div></div>
+</div>
 @endsection

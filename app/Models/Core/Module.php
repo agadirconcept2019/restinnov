@@ -9,13 +9,21 @@ class Module extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['slug', 'name', 'version', 'is_active', 'metadata'];
+    protected $fillable = [
+        'slug',
+        'name',
+        'version',
+        'is_enabled',
+        'installed_at',
+        'meta',
+    ];
 
     protected function casts(): array
     {
         return [
-            'is_active' => 'boolean',
-            'metadata' => 'array',
+            'is_enabled' => 'boolean',
+            'installed_at' => 'datetime',
+            'meta' => 'array',
         ];
     }
 }
