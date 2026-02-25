@@ -41,6 +41,12 @@ class StorePageRequest extends FormRequest
             'canonical_url_en' => ['nullable', 'url', 'max:255'],
             'canonical_url_fr' => ['nullable', 'url', 'max:255'],
             'canonical_url_es' => ['nullable', 'url', 'max:255'],
+            'robots_en' => ['nullable', 'string', 'max:100'],
+            'robots_fr' => ['nullable', 'string', 'max:100'],
+            'robots_es' => ['nullable', 'string', 'max:100'],
+            'schema_json_en' => ['nullable', 'json'],
+            'schema_json_fr' => ['nullable', 'json'],
+            'schema_json_es' => ['nullable', 'json'],
         ];
     }
 }

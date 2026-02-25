@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureUserHasPermission;
 use App\Http\Middleware\InstallGuard;
 use App\Http\Middleware\RedirectMiddleware;
 use App\Http\Middleware\SetLocale;
@@ -24,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'set.locale' => SetLocale::class,
             'install.guard' => InstallGuard::class,
             'redirect.core' => RedirectMiddleware::class,
+            'permission' => EnsureUserHasPermission::class,
         ]);
 
         $middleware->append(RedirectMiddleware::class);

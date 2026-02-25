@@ -13,6 +13,12 @@
     <header class="border-b bg-white">
         <div class="mx-auto flex max-w-6xl items-center justify-between p-4">
             <h1 class="font-semibold">Administration</h1>
+            <nav class="text-sm flex gap-3">
+                <a href="{{ route('admin.dashboard') }}">Dashboard</a>
+                <a href="{{ route('admin.access.roles.index') }}">Access</a>
+                <a href="{{ route('admin.media.index') }}">Media</a>
+                <a href="{{ route('admin.menus.index') }}">Menus</a>
+            </nav>
             @auth
                 <form method="POST" action="{{ route('admin.logout') }}">@csrf<button class="rounded bg-red-600 px-3 py-1 text-white">Logout</button></form>
             @endauth

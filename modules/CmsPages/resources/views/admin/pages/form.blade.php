@@ -19,11 +19,13 @@
     <section class="rounded border bg-white p-4">
         <h3 class="mb-2 font-semibold">2/3/4. Traduction {{ strtoupper($locale) }} + template_data + SEO</h3>
         <input name="title_{{ $locale }}" class="mb-2 w-full rounded border p-2" value="{{ old('title_'.$locale, $tr?->title) }}" placeholder="Title {{ strtoupper($locale) }}">
-        <textarea name="content_{{ $locale }}" class="mb-2 w-full rounded border p-2" rows="5" placeholder="Content {{ strtoupper($locale) }}">{{ old('content_'.$locale, $tr?->content) }}</textarea>
+        <textarea name="content_{{ $locale }}" class="mb-2 w-full rounded border p-2" rows="5" data-wysiwyg placeholder="Content {{ strtoupper($locale) }}">{{ old('content_'.$locale, $tr?->content) }}</textarea>
         <textarea name="template_data_{{ $locale }}" class="mb-2 w-full rounded border p-2" rows="6" placeholder='{"hero":{"title":"..."}}'>{{ old('template_data_'.$locale, $tr && $tr->template_data ? json_encode($tr->template_data, JSON_PRETTY_PRINT) : '') }}</textarea>
         <input name="meta_title_{{ $locale }}" class="mb-2 w-full rounded border p-2" value="{{ old('meta_title_'.$locale, $tr?->meta_title) }}" placeholder="Meta title">
         <textarea name="meta_description_{{ $locale }}" class="mb-2 w-full rounded border p-2" rows="2" placeholder="Meta description">{{ old('meta_description_'.$locale, $tr?->meta_description) }}</textarea>
         <input name="canonical_url_{{ $locale }}" class="w-full rounded border p-2" value="{{ old('canonical_url_'.$locale, $tr?->canonical_url) }}" placeholder="Canonical URL">
+        <input name="robots_{{ $locale }}" class="mb-2 w-full rounded border p-2" value="{{ old('robots_'.$locale, 'index,follow') }}" placeholder="Robots">
+        <textarea name="schema_json_{{ $locale }}" class="w-full rounded border p-2" rows="3" placeholder='{"@type":"Article"}'>{{ old('schema_json_'.$locale) }}</textarea>
     </section>
     @endforeach
 

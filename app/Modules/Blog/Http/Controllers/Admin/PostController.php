@@ -3,6 +3,8 @@
 namespace App\Modules\Blog\Http\Controllers\Admin;
 
 use App\Core\Audit\AuditLogger;
+use App\Core\Security\HtmlSanitizer;
+use App\Core\Seo\SeoMetaService;
 use App\Http\Controllers\Controller;
 use App\Modules\Blog\Http\Requests\Admin\StorePostRequest;
 use App\Modules\Blog\Models\Post;
@@ -30,7 +32,7 @@ class PostController extends Controller
         return view('blog::admin.posts.form', ['post' => new Post, 'categories' => PostCategory::with('translations')->get()]);
     }
 
-    public function store(StorePostRequest $request, AuditLogger $auditLogger)
+    public function store(StorePostRequest $request, AuditLogger $auditLogger, HtmlSanitizer $htmlSanitizer, SeoMetaService $seoMetaService)
     {
         $post = Post::query()->create([
             'slug' => $request->input('slug'),
@@ -40,7 +42,9 @@ class PostController extends Controller
             'is_featured' => (bool) $request->boolean('is_featured', false),
         ]);
 
-        $this->syncPost($post, $request->validated());
+        $this->syncPost($post, $request->validated(), $htmlSanitizer);
+        $seoMetaService->syncFor($post, $request->validated());
+
         $auditLogger->log($post->status === 'published' ? 'post.published' : 'post.created', $post, ['slug' => $post->slug]);
 
         return redirect()->route('admin.blog.posts.edit', $post)->with('status', 'Post created.');
@@ -53,7 +57,7 @@ class PostController extends Controller
         return view('blog::admin.posts.form', ['post' => $post, 'categories' => PostCategory::with('translations')->get()]);
     }
 
-    public function update(StorePostRequest $request, Post $post, AuditLogger $auditLogger)
+    public function update(StorePostRequest $request, Post $post, AuditLogger $auditLogger, HtmlSanitizer $htmlSanitizer, SeoMetaService $seoMetaService)
     {
         $post->update([
             'slug' => $request->input('slug'),
@@ -62,7 +66,9 @@ class PostController extends Controller
             'is_featured' => (bool) $request->boolean('is_featured', false),
         ]);
 
-        $this->syncPost($post, $request->validated());
+        $this->syncPost($post, $request->validated(), $htmlSanitizer);
+        $seoMetaService->syncFor($post, $request->validated());
+
         $auditLogger->log($post->status === 'published' ? 'post.published' : 'post.updated', $post, ['slug' => $post->slug]);
 
         return back()->with('status', 'Post updated.');
@@ -76,7 +82,7 @@ class PostController extends Controller
         return redirect()->route('admin.blog.posts.index')->with('status', 'Post deleted.');
     }
 
-    private function syncPost(Post $post, array $data): void
+    private function syncPost(Post $post, array $data, HtmlSanitizer $sanitizer): void
     {
         foreach (['en', 'fr', 'es'] as $locale) {
             if (empty($data['title_'.$locale])) {
@@ -88,7 +94,7 @@ class PostController extends Controller
                 [
                     'title' => $data['title_'.$locale],
                     'excerpt' => $data['excerpt_'.$locale] ?? null,
-                    'content' => $data['content_'.$locale] ?? null,
+                    'content' => $sanitizer->sanitize($data['content_'.$locale] ?? null),
                     'meta_title' => $data['meta_title_'.$locale] ?? null,
                     'meta_description' => $data['meta_description_'.$locale] ?? null,
                     'canonical_url' => $data['canonical_url_'.$locale] ?? null,
