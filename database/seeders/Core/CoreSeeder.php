@@ -38,13 +38,13 @@ class CoreSeeder extends Seeder
             );
         }
 
-        foreach (['core', 'real-estate', 'cms-pages', 'blog', 'forms'] as $slug) {
+        foreach (['core', 'real-estate', 'cms-pages', 'blog', 'forms', 'owner-portal'] as $slug) {
             Module::query()->updateOrCreate(
                 ['slug' => $slug],
                 [
                     'name' => str($slug)->replace('-', ' ')->title()->toString(),
                     'version' => '1.0.0',
-                    'is_enabled' => in_array($slug, ['core', 'real-estate', 'cms-pages', 'blog', 'forms'], true),
+                    'is_enabled' => in_array($slug, ['core', 'real-estate', 'cms-pages', 'blog', 'forms', 'owner-portal'], true),
                     'installed_at' => now(),
                     'meta' => ['source' => 'core-seeder'],
                 ],

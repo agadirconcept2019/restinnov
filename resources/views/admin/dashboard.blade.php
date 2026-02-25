@@ -18,5 +18,8 @@
     <a class="text-blue-600" href="{{ route('admin.blog.posts.index') }}">Manage Blog</a>
     <a class="text-blue-600" href="{{ route('admin.redirects.index') }}">Manage Redirects</a>
     <a class="text-blue-600" href="{{ route('admin.audit-logs.index') }}">Audit Logs</a>
+    <a class="text-blue-600" href="{{ route('admin.owners.index') }}">Manage Owners</a>
+    <a class="text-blue-600" href="{{ route('owner.dashboard') }}">Owner Portal</a>
 </div>
 @endsection
+

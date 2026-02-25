@@ -1,0 +1,8 @@
+{
+  "name": "OwnerPortal",
+  "slug": "owner-portal",
+  "version": "1.0.0",
+  "providers": [
+    "App\\Modules\\OwnerPortal\\OwnerPortalServiceProvider"
+  ]
+}

@@ -7,6 +7,7 @@
 
     <section class="rounded border bg-white p-4"><h3 class="mb-2 font-semibold">1. Général</h3>
         <input name="slug" class="mb-2 w-full rounded border p-2" value="{{ old('slug',$property->slug) }}" placeholder="slug">
+        <select name="owner_user_id" class="mb-2 w-full rounded border p-2"><option value="">-- owner --</option>@foreach($owners as $owner)<option value="{{ $owner->id }}" @selected(old('owner_user_id',$property->owner_user_id)===$owner->id)>{{ $owner->name }} ({{ $owner->email }})</option>@endforeach</select>
         <select name="status" class="w-full rounded border p-2">@foreach(['draft','published','archived'] as $s)<option value="{{ $s }}" @selected(old('status',$property->status?:'draft')===$s)>{{ $s }}</option>@endforeach</select>
     </section>
 

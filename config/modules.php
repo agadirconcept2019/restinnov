@@ -9,5 +9,6 @@ return [
         'cms-pages',
         'blog',
         'forms',
+        'owner-portal',
     ],
 ];

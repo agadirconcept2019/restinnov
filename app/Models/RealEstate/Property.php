@@ -12,7 +12,7 @@ class Property extends Model
     protected static function newFactory(){ return \Database\Factories\PropertyFactory::new(); }
 
     protected $fillable = [
-        'slug','status','property_type_id','rental_mode_id','city_id','area_id','base_price_per_night','currency','max_guests','bedrooms','beds','bathrooms','checkin_from','checkout_until','address_line','latitude','longitude','is_featured','published_at','created_by','updated_by'
+        'slug','status','property_type_id','rental_mode_id','city_id','area_id','base_price_per_night','currency','max_guests','bedrooms','beds','bathrooms','checkin_from','checkout_until','address_line','latitude','longitude','is_featured','published_at','created_by','updated_by','owner_user_id'
     ];
 
     protected function casts(): array
@@ -29,6 +29,7 @@ class Property extends Model
     public function amenities(){ return $this->belongsToMany(Amenity::class,'property_amenity'); }
     public function availabilities(){ return $this->hasMany(PropertyAvailability::class); }
     public function inquiries(){ return $this->hasMany(PropertyInquiry::class); }
+    public function owner(){ return $this->belongsTo(\App\Models\User::class, 'owner_user_id'); }
     public function bookingRequests(){ return $this->hasMany(BookingRequest::class); }
     public function icalFeeds(){ return $this->hasMany(PropertyIcalFeed::class); }
 

@@ -18,6 +18,7 @@ class StorePropertyRequest extends FormRequest
             'rental_mode_id' => ['required','exists:rental_modes,id'],
             'city_id' => ['required','exists:cities,id'],
             'area_id' => ['nullable','exists:areas,id'],
+            'owner_user_id' => ['nullable','exists:users,id'],
             'base_price_per_night' => ['required','numeric','min:0'],
             'currency' => ['required','string','size:3'],
             'max_guests' => ['required','integer','min:1'],

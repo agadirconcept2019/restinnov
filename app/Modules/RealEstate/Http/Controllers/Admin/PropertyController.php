@@ -10,6 +10,7 @@ use App\Models\RealEstate\City;
 use App\Models\RealEstate\Property;
 use App\Models\RealEstate\PropertyType;
 use App\Models\RealEstate\RentalMode;
+use App\Models\User;
 use App\Modules\RealEstate\Http\Requests\Admin\StorePropertyRequest;
 
 class PropertyController extends Controller
@@ -44,9 +45,13 @@ class PropertyController extends Controller
 
     public function update(StorePropertyRequest $request, Property $property, AuditLogger $auditLogger)
     {
+        $beforeOwner = $property->owner_user_id;
         $property->update($this->propertyPayload($request->validated()) + ['updated_by' => auth()->id()]);
         $this->syncRelations($property, $request->validated());
         $auditLogger->log($property->status === 'published' ? 'property.published' : 'property.updated', $property, ['slug' => $property->slug]);
+        if ((int) $beforeOwner !== (int) $property->owner_user_id) {
+            $auditLogger->log('property.owner_assigned', $property, ['owner_user_id' => $property->owner_user_id]);
+        }
 
         return back()->with('status', 'Property updated.');
     }
@@ -68,13 +73,14 @@ class PropertyController extends Controller
             'cities' => City::with('translations')->get(),
             'areas' => Area::with('translations')->get(),
             'amenities' => Amenity::with('translations')->get(),
+            'owners' => User::query()->where('role', 'owner')->orderBy('name')->get(),
         ];
     }
 
     private function propertyPayload(array $data): array
     {
         return collect($data)->only([
-            'slug','status','property_type_id','rental_mode_id','city_id','area_id','base_price_per_night','currency','max_guests','bedrooms','beds','bathrooms','checkin_from','checkout_until','address_line','latitude','longitude','is_featured','published_at'
+            'slug','status','property_type_id','rental_mode_id','city_id','area_id','base_price_per_night','currency','max_guests','bedrooms','beds','bathrooms','checkin_from','checkout_until','address_line','latitude','longitude','is_featured','published_at','owner_user_id'
         ])->toArray();
     }
 
