@@ -10,6 +10,9 @@
 </div>
 <div class="mt-4 flex gap-6">
     <a class="text-blue-600" href="{{ route('admin.real-estate.properties.index') }}">Manage Real Estate</a>
+    <a class="text-blue-600" href="{{ route('admin.real-estate.availability.index') }}">Availability Calendar</a>
+    <a class="text-blue-600" href="{{ route('admin.real-estate.booking-requests.index') }}">Booking Requests</a>
+    <a class="text-blue-600" href="{{ route('admin.real-estate.ical-feeds.index') }}">iCal Feeds</a>
     <a class="text-blue-600" href="{{ route('admin.cms-pages.pages.index') }}">Manage CMS Pages</a>
     <a class="text-blue-600" href="{{ route('admin.forms.submissions.index') }}">Manage Forms</a>
     <a class="text-blue-600" href="{{ route('admin.blog.posts.index') }}">Manage Blog</a>

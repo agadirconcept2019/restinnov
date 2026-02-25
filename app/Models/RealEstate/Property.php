@@ -29,6 +29,8 @@ class Property extends Model
     public function amenities(){ return $this->belongsToMany(Amenity::class,'property_amenity'); }
     public function availabilities(){ return $this->hasMany(PropertyAvailability::class); }
     public function inquiries(){ return $this->hasMany(PropertyInquiry::class); }
+    public function bookingRequests(){ return $this->hasMany(BookingRequest::class); }
+    public function icalFeeds(){ return $this->hasMany(PropertyIcalFeed::class); }
 
     public function translated(?string $locale = null): ?PropertyTranslation
     {

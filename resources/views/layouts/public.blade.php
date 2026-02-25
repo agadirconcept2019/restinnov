@@ -16,7 +16,7 @@
     <meta name="twitter:card" content="{{ $seo['twitter_card'] ?? 'summary_large_image' }}">
     <meta name="twitter:title" content="{{ $seo['og_title'] ?? ($seo['meta_title'] ?? config('app.name')) }}">
     <meta name="twitter:description" content="{{ $seo['og_description'] ?? ($seo['meta_description'] ?? '') }}">
-    <meta name="robots" content="{{ $seo['robots'] ?? 'index,follow' }}">
+    <meta name="robots" content="@yield('robots', $seo['robots'] ?? 'index,follow')">
     @foreach(($seo['hreflang'] ?? []) as $locale => $href)
         <link rel="alternate" hreflang="{{ $locale }}" href="{{ $href }}">
     @endforeach

@@ -18,6 +18,16 @@
     </section>
 
     <section class="mb-6 rounded border bg-white p-6">
+        <h2 class="text-xl font-semibold">Search stay</h2>
+        <form method="GET" action="{{ route('realestate.properties.index') }}" class="mt-2 grid gap-2 md:grid-cols-4">
+            <input type="date" name="checkin" class="rounded border p-2">
+            <input type="date" name="checkout" class="rounded border p-2">
+            <input type="number" name="guests" min="1" class="rounded border p-2" placeholder="Guests">
+            <button class="rounded bg-slate-900 px-4 py-2 text-white">Search</button>
+        </form>
+    </section>
+
+    <section class="mb-6 rounded border bg-white p-6">
         <h2 class="text-xl font-semibold">Services</h2>
         <p>{{ data_get($data,'services_teaser.text', $translation?->content) }}</p>
     </section>
