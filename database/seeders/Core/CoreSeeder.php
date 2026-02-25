@@ -43,7 +43,7 @@ class CoreSeeder extends Seeder
                 [
                     'name' => str($slug)->replace('-', ' ')->title()->toString(),
                     'version' => '1.0.0',
-                    'is_enabled' => in_array($slug, ['core', 'cms-pages', 'blog', 'forms'], true),
+                    'is_enabled' => in_array($slug, ['core', 'real-estate', 'cms-pages', 'blog', 'forms'], true),
                     'installed_at' => now(),
                     'meta' => ['source' => 'core-seeder'],
                 ],

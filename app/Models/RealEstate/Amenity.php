@@ -3,11 +3,10 @@ namespace App\Models\RealEstate;
 use App\Models\RealEstate\Concerns\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-class City extends Model
+class Amenity extends Model
 {
     use HasFactory, HasTranslations;
     protected $fillable=['slug','is_active'];
     protected $casts=['is_active'=>'boolean'];
-    protected static function newFactory(){ return \Database\Factories\CityFactory::new(); }
-    public function translations(){ return $this->hasMany(CityTranslation::class); }
+    public function translations(){ return $this->hasMany(AmenityTranslation::class); }
 }
