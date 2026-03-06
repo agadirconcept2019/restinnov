@@ -1,0 +1,8 @@
+{
+  "name": "Real Estate",
+  "slug": "real-estate",
+  "version": "1.0.0",
+  "providers": [
+    "App\\Modules\\RealEstate\\RealEstateServiceProvider"
+  ]
+}

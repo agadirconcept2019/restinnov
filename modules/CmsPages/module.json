@@ -1,0 +1,8 @@
+{
+  "name": "CMS Pages",
+  "slug": "cms-pages",
+  "version": "1.0.0",
+  "providers": [
+    "App\\Modules\\CmsPages\\CmsPagesServiceProvider"
+  ]
+}
